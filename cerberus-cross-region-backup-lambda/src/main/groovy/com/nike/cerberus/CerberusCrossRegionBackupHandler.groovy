@@ -143,7 +143,6 @@ class CerberusCrossRegionBackupHandler {
         def key = "cerberus-backup-metadata.json"
         log.info("Saving metadata: ${metadata} to ${prefix}/${key}")
         saveDataToS3(s3EncryptionClient, metadata, backupBucket, prefix, key)
-        trackMetadataMetrics(metadata)
 
         if (metadata.numberOfKeyValuePairs < 1) {
             throw new RuntimeException("The number of backed up key value pairs was less than 1, this probably means something bad is going on")
@@ -157,35 +156,6 @@ class CerberusCrossRegionBackupHandler {
         def keys = getKeys(client, null, token)
         if (keys.size() < 1) {
             throw new IllegalStateException("The token provided failed to return any data when listing for the root node")
-        }
-    }
-
-    void trackMetadataMetrics(Map metadata) {
-        try {
-            AmazonSNS sns = AmazonSNSClient.builder().standard().build()
-
-            def topicArn = EnvUtils.getRequiredEnv('CERBERUS_METRICS_TOPIC', 'The ARN for the Cerberus Metrics Topic')
-
-            Map<String, String> dimensions = [:]
-            dimensions.put('cerberusUrl', "${metadata.remove('cerberusUrl')}")
-            dimensions.put('lambdaBackupAccountId', "${metadata.remove('lambdaBackupAccountId')}")
-            dimensions.put('lambdaBackupRegion', "${metadata.remove('lambdaBackupRegion')}")
-            dimensions.put('environment', "cerberus-${EnvUtils.getRequiredEnv('ENVIRONMENT').toLowerCase()}")
-            
-            Map<String, String> properties = [:]
-            properties.put('cerberusUrl', "${metadata.remove('backupDate')}")
-
-            metadata.each { metric ->
-                sns.publish(topicArn, new JsonBuilder([
-                        metricKey: metric.key as String,
-                        metricValue: metric.value as Integer,
-                        metricType: 'gauge',
-                        dimensions: dimensions
-                ]).toString())
-            }
-
-        } catch (Throwable t) {
-            log.error("Failed to track metadata metrics", t)
         }
     }
 

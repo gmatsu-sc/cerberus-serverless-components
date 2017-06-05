@@ -11,12 +11,6 @@ Parameters:
   AdminUserArn:
     Type: String
     Description: The arn for the admin user
-  SubnetIds:
-    Type: CommaDelimitedList
-    Description: Comma-separated VPC subnet Ids to add
-  SecurityGroupIds:
-    Type: CommaDelimitedList
-    Description: Comma-separated list of security groups to use with the lambda, the default security group should be fine here
 Resources:
   CerberusCrossRegionBackupFunction:
     Type: 'AWS::Serverless::Function'
@@ -29,11 +23,6 @@ Resources:
       Timeout: 300
       CodeUri: @@CODE_URI@@
       Role: !GetAtt CerberusCrossRegionBackupRole.Arn
-      Events:
-        Timer:
-          Type: Schedule
-          Properties:
-            Schedule: cron(7 * * * ? *)
       Environment:
         Variables:
           ROLE_NAME: !Ref CerberusCrossRegionBackupRole
@@ -43,10 +32,6 @@ Resources:
           KMS_KEY_ID: !Ref CerberusCrossRegionBackupKmsKey
           CERBERUS_URL: !Ref CerberusUrl
           ENVIRONMENT: !Ref Environment
-          CERBERUS_METRICS_TOPIC: !ImportValue CerberusMetricsTopicARN
-      VpcConfig:
-        SubnetIds: !Ref SubnetIds
-        SecurityGroupIds: !Ref SecurityGroupIds
   CerberusCrossRegionBackupRole:
     Type: "AWS::IAM::Role"
     Properties:

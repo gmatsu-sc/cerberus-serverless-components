@@ -27,19 +27,17 @@ dependencies {
 }
 
 'aws-sam-deployer' {
-    region = getProfileProperty('backup.region')
-    s3Bucket = getProfileProperty('backup.lambda_artifact.s3_bucket')
-    s3Prefix = "${project.getName()}-artifact-uploads"
-    stackName = "${project.environment}-${getProfileProperty('backup.stack_suffix')}-cerberus-cross-region-backup"
+    region = 'THE REGION THAT YOU WANT TO RUN THE LAMBDA IN, THE BELOW BUCKET NEEDS TO BE IN THAT REGION TOO'
+    s3Bucket = 'A-BUCKET-THAT-YOUR-CURRENT-AWS-CREDS-CAN-WRITE-TOO'
+    s3Prefix = 'lambda-uploads'
+    stackName = "burdz-cerberus-cross-region-backup"
     samTemplatePath = "${project.projectDir}${File.separator}application.yaml"
     tokenArtifactMap = [
             '@@CODE_URI@@': "${project.buildDir}${File.separator}libs${File.separator}${project.getName()}-${version}.jar"
     ]
     parameterOverrides = [
-            Environment: project.environment,
-            CerberusUrl: getProfileProperty('cerberus.url'),
-            AdminUserArn: getProfileProperty('cerberus.admin_user_arn'),
-            SubnetIds: getProfileProperty('backup.lambda_vpc.subnet_ids'),
-            SecurityGroupIds: getProfileProperty('backup.lambda_vpc.security_group_ids')
+            Environment: 'THE ENVIRONMENT YOU ARE BACKING UP',
+            CerberusUrl: 'THE CERBERUS URL',
+            AdminUserArn: 'THE ROLE OR USER ARN THAT YOU RUN THE CLI AS',
     ]
 }

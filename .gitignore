@@ -85,7 +85,7 @@ src/main/resources/cloudformation/**
 **/profile/*
 !**/profile/default.properties
 !**/profile/example.properties
-/profile/test.properties
-/profile/dev.properties
-/profile/prod.properties
-/profile/global.properties
+/profile/foo/test.properties
+/profile/foo/dev.properties
+/profile/foo/prod.properties
+/profile/foo/global.properties
