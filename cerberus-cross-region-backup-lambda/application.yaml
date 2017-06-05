@@ -84,16 +84,6 @@ Resources:
                 Action:
                   - kms:Decrypt
                 Resource: "*"
-        -
-          PolicyName: "track-metrics"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action:
-                  - SNS:Publish
-                Resource: !ImportValue CerberusMetricsTopicARN
   CerberusCrossRegionBackupS3Bucket:
     Type: "AWS::S3::Bucket"
     Properties:
@@ -130,7 +120,7 @@ Resources:
           -
             Sid: "Allow administration of the key"
             Effect: "Allow"
-            Principal:
+            Principal:-
               AWS:
                 - !Ref AdminUserArn
             Action:
